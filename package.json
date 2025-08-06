@@ -1,0 +1,28 @@
+{
+  "name": "trading-bot-breakout",
+  "version": "1.0.0",
+  "description": "Торговый бот со стратегией пробития уровней",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2",
+    "axios": "^1.6.0",
+    "technicalindicators": "^3.1.0",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.7.0"
+  },
+  "keywords": ["trading", "bot", "breakout", "strategy"],
+  "author": "Trading Bot Developer",
+  "license": "MIT"
+} 
