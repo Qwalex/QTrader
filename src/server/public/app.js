@@ -1,6 +1,13 @@
 class TradingBotUI {
     constructor() {
-        this.apiBase = '/api';
+        // Определяем базовый путь API в зависимости от текущего URL
+        const currentPath = window.location.pathname;
+        if (currentPath.startsWith('/trader')) {
+            this.apiBase = '/trader/api';
+        } else {
+            this.apiBase = '/api';
+        }
+        
         this.updateInterval = null;
         this.init();
     }

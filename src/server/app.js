@@ -52,6 +52,7 @@ class TradingBotServer {
   setupRoutes() {
     // API маршруты должны быть первыми
     this.app.use('/api', this.createApiRoutes());
+    this.app.use('/trader/api', this.createApiRoutes()); // Поддержка через /trader/
     
     // Явная настройка для статических файлов с правильными MIME-типами
     this.app.get('/app.js', (req, res) => {
@@ -71,6 +72,14 @@ class TradingBotServer {
     
     // Главная страница
     this.app.get('/', (req, res) => {
+      res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    });
+    
+    this.app.get('/trader', (req, res) => {
+      res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    });
+    
+    this.app.get('/trader/', (req, res) => {
       res.sendFile(path.join(__dirname, 'public', 'index.html'));
     });
     
