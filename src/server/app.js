@@ -32,14 +32,14 @@ class TradingBotServer {
     // Настройка MIME-типов для статических файлов
     const publicPath = path.join(__dirname, 'public');
     const express_static = express.static(publicPath, {
-      setHeaders: (res, path, stat) => {
-        if (path.endsWith('.js')) {
+      setHeaders: (res, filePath, stat) => {
+        if (filePath.endsWith('.js')) {
           res.set('Content-Type', 'application/javascript; charset=UTF-8');
-        } else if (path.endsWith('.css')) {
+        } else if (filePath.endsWith('.css')) {
           res.set('Content-Type', 'text/css; charset=UTF-8');
-        } else if (path.endsWith('.html')) {
+        } else if (filePath.endsWith('.html')) {
           res.set('Content-Type', 'text/html; charset=UTF-8');
-        } else if (path.endsWith('.json')) {
+        } else if (filePath.endsWith('.json')) {
           res.set('Content-Type', 'application/json; charset=UTF-8');
         }
       }
@@ -50,28 +50,36 @@ class TradingBotServer {
 
   // Настройка маршрутов
   setupRoutes() {
-    // Явная настройка для статических JS файлов
-    this.app.get('*.js', (req, res, next) => {
-      res.type('application/javascript');
-      next();
-    });
-
-    // Явная настройка для статических CSS файлов
-    this.app.get('*.css', (req, res, next) => {
-      res.type('text/css');
-      next();
-    });
-
-    // API маршруты
+    // API маршруты должны быть первыми
     this.app.use('/api', this.createApiRoutes());
     
-    // Веб-интерфейс
+    // Явная настройка для статических файлов с правильными MIME-типами
+    this.app.get('/app.js', (req, res) => {
+      res.set('Content-Type', 'application/javascript; charset=UTF-8');
+      res.sendFile(path.join(__dirname, 'public', 'app.js'));
+    });
+
+    this.app.get('*.js', (req, res, next) => {
+      res.set('Content-Type', 'application/javascript; charset=UTF-8');
+      next();
+    });
+
+    this.app.get('*.css', (req, res, next) => {
+      res.set('Content-Type', 'text/css; charset=UTF-8');
+      next();
+    });
+    
+    // Главная страница
     this.app.get('/', (req, res) => {
       res.sendFile(path.join(__dirname, 'public', 'index.html'));
     });
     
-    // Fallback для всех остальных маршрутов
-    this.app.get('*', (req, res) => {
+    // Fallback для всех остальных маршрутов (но не для статических файлов)
+    this.app.get('*', (req, res, next) => {
+      // Проверяем, не является ли это запросом к статическому файлу
+      if (req.url.match(/\.(js|css|html|png|jpg|gif|ico)$/)) {
+        return next(); // Пропускаем к обработчику статических файлов
+      }
       res.sendFile(path.join(__dirname, 'public', 'index.html'));
     });
   }
