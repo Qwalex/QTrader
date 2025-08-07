@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const path = require('path');
 const TradingBot = require('../trading/tradingBot');
 const config = require('../config/config');
 
@@ -27,22 +28,51 @@ class TradingBotServer {
     }));
     this.app.use(cors());
     this.app.use(express.json());
-    this.app.use(express.static(__dirname + '/public'));
+
+    // Настройка MIME-типов для статических файлов
+    const publicPath = path.join(__dirname, 'public');
+    const express_static = express.static(publicPath, {
+      setHeaders: (res, path, stat) => {
+        if (path.endsWith('.js')) {
+          res.set('Content-Type', 'application/javascript; charset=UTF-8');
+        } else if (path.endsWith('.css')) {
+          res.set('Content-Type', 'text/css; charset=UTF-8');
+        } else if (path.endsWith('.html')) {
+          res.set('Content-Type', 'text/html; charset=UTF-8');
+        } else if (path.endsWith('.json')) {
+          res.set('Content-Type', 'application/json; charset=UTF-8');
+        }
+      }
+    });
+    
+    this.app.use(express_static);
   }
 
   // Настройка маршрутов
   setupRoutes() {
+    // Явная настройка для статических JS файлов
+    this.app.get('*.js', (req, res, next) => {
+      res.type('application/javascript');
+      next();
+    });
+
+    // Явная настройка для статических CSS файлов
+    this.app.get('*.css', (req, res, next) => {
+      res.type('text/css');
+      next();
+    });
+
     // API маршруты
     this.app.use('/api', this.createApiRoutes());
     
     // Веб-интерфейс
     this.app.get('/', (req, res) => {
-      res.sendFile(__dirname + '/public/index.html');
+      res.sendFile(path.join(__dirname, 'public', 'index.html'));
     });
     
     // Fallback для всех остальных маршрутов
     this.app.get('*', (req, res) => {
-      res.sendFile(__dirname + '/public/index.html');
+      res.sendFile(path.join(__dirname, 'public', 'index.html'));
     });
   }
 
